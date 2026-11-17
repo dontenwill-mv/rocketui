@@ -1,0 +1,27 @@
+#!/usr/bin/env python3
+"""Transkribiert eine WAV-Datei nach stdout. Läuft komplett lokal.
+
+Aufruf: rc-tui-stt <datei.wav>
+Modell und Decoding stehen unten -- large-v3-turbo mit beam 5 ist auf
+Wortgenauigkeit getrimmt, "small" mit beam 1 waere rund 3x schneller.
+"""
+import sys
+import os
+
+MODEL = os.environ.get("RC_TUI_STT_MODEL", "large-v3-turbo")
+BEAM = int(os.environ.get("RC_TUI_STT_BEAM", "5"))
+LANG = os.environ.get("RC_TUI_STT_LANG", "de")
+
+if len(sys.argv) != 2:
+    sys.exit("Aufruf: rc-tui-stt <datei.wav>")
+
+# onnxruntime schreibt beim GPU-Suchen auf stderr, das will hier niemand sehen
+os.environ.setdefault("ORT_LOGGING_LEVEL", "3")
+
+from faster_whisper import WhisperModel
+
+model = WhisperModel(MODEL, device="cpu", compute_type="int8",
+                     cpu_threads=os.cpu_count() or 4)
+segments, _ = model.transcribe(sys.argv[1], language=LANG,
+                               beam_size=BEAM, vad_filter=True)
+print(" ".join(s.text.strip() for s in segments).strip())

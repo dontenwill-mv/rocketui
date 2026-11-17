@@ -1,0 +1,20 @@
+# Gebautes Binary: heißt wie der Ordner, landet beim `go build` genau hier.
+# Der führende / verankert den Namen auf die Repo-Wurzel, kein * dahinter --
+# sonst schluckt die Regel auch rc-tui-stt, und das Diktat-Skript gehört rein.
+/rc-tui
+
+# Wegwerf-Tests aus Debug-Sitzungen.
+zz_*_test.go
+
+# Diktat-Aufnahmen. Landen eigentlich in os.TempDir(), aber TMPDIR kann zeigen,
+# wohin es will.
+*.wav
+
+# Zugangsdaten gehören nach ~/.config/rc-tui/config.yml, nie hierher.
+# Diese Zeilen sind das Netz darunter, falls doch mal eine Kopie hier liegt.
+config.yml
+.env
+
+# Coverage- und Profil-Ausgaben der Go-Toolchain.
+*.out
+*.test
